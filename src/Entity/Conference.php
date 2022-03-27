@@ -7,36 +7,24 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ConferenceRepository::class)
- */
+#[ORM\Entity(repositoryClass: ConferenceRepository::class)]
 class Conference
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $city;
 
-    /**
-     * @ORM\Column(type="string", length=4)
-     */
+    #[ORM\Column(type: 'string', length: 4)]
     private $year;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $isInternational;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="conference", orphanRemoval=true)
-     */
+    #[ORM\OneToMany(mappedBy: 'conference', targetEntity: Comment::class, orphanRemoval: true)]
     private $comments;
 
     public function __construct()
@@ -91,7 +79,7 @@ class Conference
     }
 
     /**
-     * @return Collection<int, Comment>
+     * @return Collection|Comment[]
      */
     public function getComments(): Collection
     {

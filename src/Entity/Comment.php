@@ -5,47 +5,31 @@ namespace App\Entity;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CommentRepository::class)
- */
+#[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $author;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $text;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $email;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime_immutable')]
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Conference::class, inversedBy="comments")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Conference::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
     private $conference;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $photoFilename;
 
     public function __toString(): string
@@ -94,12 +78,12 @@ class Comment
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
