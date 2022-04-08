@@ -14,6 +14,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
@@ -34,11 +36,26 @@ class ConferenceController extends AbstractController
     #[Route('/', name: 'homepage')]
     public function index(ConferenceRepository $conferenceRepository): Response
     {
-        return new Response(
+        $response = new Response(
             $this->twig->render('conference/index.html.twig', [
                 'conferences' => $conferenceRepository->findAll(),
             ])
         );
+        $response->setSharedMaxAge(3600);
+
+        return $response;
+    }
+
+    #[Route('/conference_header', name: 'conference_header')]
+    public function conferenceHeader(ConferenceRepository $conferenceRepository): Response
+    {
+        $response = new Response(
+            $this->twig->render('conference/header.html.twig', [
+                'conferences' => $conferenceRepository->findAll(),
+            ])
+        );
+        $response->setSharedMaxAge(3600);
+        return $response;
     }
 
     #[Route('/conference/{slug}', name: 'conference')]
@@ -91,5 +108,21 @@ class ConferenceController extends AbstractController
                 'comment_form' => $form->createView(),
             ])
         );
+    }
+
+    #[Route('/admin/http-cache/{uri<.*>}', methods: ['PURGE'])]
+    public function purgeHttpCache(
+        KernelInterface $kernel,
+        Request $request,
+        string $uri,
+        StoreInterface $store
+    ): Response {
+        if ('prod' === $kernel->getEnvironment()) {
+            return new Response('KO', 400);
+        }
+
+        $store->purge($request->getSchemeAndHttpHost() . '/' . $uri);
+
+        return new Response('Done');
     }
 }
