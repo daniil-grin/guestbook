@@ -14,8 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
@@ -97,8 +95,6 @@ class ConferenceController extends AbstractController
         $offset = max(0, $request->query->getInt('offset', 0));
         $paginator = $commentRepository->getCommentPaginator($conference, $offset);
 
-        dump($paginator->count());
-        dump(min($paginator->count(), $offset + CommentRepository::PAGINATOR_PER_PAGE));
         return new Response(
             $this->twig->render('conference/show.html.twig', [
                 'conference' => $conference,
@@ -108,21 +104,5 @@ class ConferenceController extends AbstractController
                 'comment_form' => $form->createView(),
             ])
         );
-    }
-
-    #[Route('/admin/http-cache/{uri<.*>}', methods: ['PURGE'])]
-    public function purgeHttpCache(
-        KernelInterface $kernel,
-        Request $request,
-        string $uri,
-        StoreInterface $store
-    ): Response {
-        if ('prod' === $kernel->getEnvironment()) {
-            return new Response('KO', 400);
-        }
-
-        $store->purge($request->getSchemeAndHttpHost() . '/' . $uri);
-
-        return new Response('Done');
     }
 }
